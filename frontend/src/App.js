@@ -5,10 +5,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OptionChain from './pages/OptionChain';
+
 
 console.log('ProtectedRoute:', ProtectedRoute);
 console.log('Layout:', Layout);
-//console.log('Dashboard:', Dashboard);
 console.log('Login:', Login);
 console.log('Register:', Register);
 
@@ -22,6 +23,14 @@ function App() {
          {/* <Route path="/Layout" element={<Layout />} /> */}
         {/* Protected Route with Layout */}
         <Route
+          path="/OptionChain"
+          element={
+            <ProtectedRoute>
+              <OptionChain />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
@@ -29,13 +38,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* <Route
-          path="/"
-          element={
-              <Layout />
-          }
-        /> */}
       </Routes>
     </Router>
   );
