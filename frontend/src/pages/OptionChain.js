@@ -1,10 +1,77 @@
 // src/pages/OptionChain.js
 import React, { useEffect, useState } from 'react';
+import '../OptionChain.css';
+
+const OptionRow = React.memo(({ row, cmp, highlight, getClass, getPercent }) => {
+  if (row.isCMP) {
+    return (
+      <tr className="table-primary fw-bold">
+        <td colSpan="9">Current Market Price: {cmp}</td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr>
+      <td className={getClass(row.CE?.openInterest, highlight.maxOI_CE, highlight.secOI_CE, 'CE')}>
+        {row.CE?.openInterest ?? '-'}<br />
+        {row.CE?.openInterest && <span className="percent-pill">{getPercent(row.CE.openInterest, highlight.maxOI_CE)}</span>}
+      </td>
+      <td className={getClass(row.CE?.changeinOpenInterest, highlight.maxCOI_CE, highlight.secCOI_CE, 'CE')}>
+        {row.CE?.changeinOpenInterest ?? '-'}<br />
+        {row.CE?.changeinOpenInterest && <span className="percent-pill">{getPercent(row.CE.changeinOpenInterest, highlight.maxCOI_CE)}</span>}
+      </td>
+      <td className={getClass(row.CE?.totalTradedVolume, highlight.maxVOL_CE, highlight.secVOL_CE, 'CE')}>
+        {row.CE?.totalTradedVolume ?? '-'}<br />
+        {row.CE?.totalTradedVolume && <span className="percent-pill">{getPercent(row.CE.totalTradedVolume, highlight.maxVOL_CE)}</span>}
+      </td>
+      <td>{row.CE?.lastPrice ?? '-'}</td>
+      <td className="fw-bold text-center bg-light text-dark">{row.strikePrice}</td>
+      <td>{row.PE?.lastPrice ?? '-'}</td>
+      <td className={getClass(row.PE?.totalTradedVolume, highlight.maxVOL_PE, highlight.secVOL_PE, 'PE')}>
+        {row.PE?.totalTradedVolume ?? '-'}<br />
+        {row.PE?.totalTradedVolume && <span className="percent-pill">{getPercent(row.PE.totalTradedVolume, highlight.maxVOL_PE)}</span>}
+      </td>
+      <td className={getClass(row.PE?.changeinOpenInterest, highlight.maxCOI_PE, highlight.secCOI_PE, 'PE')}>
+        {row.PE?.changeinOpenInterest ?? '-'}<br />
+        {row.PE?.changeinOpenInterest && <span className="percent-pill">{getPercent(row.PE.changeinOpenInterest, highlight.maxCOI_PE)}</span>}
+      </td>
+      <td className={getClass(row.PE?.openInterest, highlight.maxOI_PE, highlight.secOI_PE, 'PE')}>
+        {row.PE?.openInterest ?? '-'}<br />
+        {row.PE?.openInterest && <span className="percent-pill">{getPercent(row.PE.openInterest, highlight.maxOI_PE)}</span>}
+      </td>
+    </tr>
+  );
+}, (prev, next) => {
+  const p = prev.row;
+  const n = next.row;
+  return (
+    p.strikePrice === n.strikePrice &&
+    JSON.stringify(p.CE) === JSON.stringify(n.CE) &&
+    JSON.stringify(p.PE) === JSON.stringify(n.PE) &&
+    p.isCMP === n.isCMP
+  );
+});
 
 const OptionChain = () => {
   const [index, setIndex] = useState('NIFTY');
-  const [data, setData] = useState(null);
+  const [records, setRecords] = useState([]);
+  const [meta, setMeta] = useState({ cmp: 0, timestamp: '' });
   const [loading, setLoading] = useState(false);
+
+  const getMaxSecondMax = (field, side, data) => {
+    const values = data.map(row => row?.[side]?.[field] || 0);
+    const sorted = [...new Set(values)].sort((a, b) => b - a);
+    return [sorted[0] || 1, sorted[1] || 1];
+  };
+
+  const getClass = (val, max, second, side) => {
+    if (val === max) return side === 'CE' ? 'bg-danger text-white' : 'bg-success text-white';
+    if (val === second) return 'bg-warning';
+    return '';
+  };
+
+  const getPercent = (val, max) => `${Math.round((val / max) * 100)}%`;
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -14,7 +81,19 @@ const OptionChain = () => {
           credentials: 'include'
         });
         const result = await res.json();
-        setData(result);
+        const cmp = result?.records?.[0]?.CE?.underlyingValue || 25000;
+        const sortedAsc = [...(result.records || [])].sort((a, b) => a.strikePrice - b.strikePrice);
+        const lowerIndex = sortedAsc.findIndex(row => row.strikePrice > cmp);
+        const below = sortedAsc.slice(Math.max(0, lowerIndex - 15), lowerIndex);
+        const above = sortedAsc.slice(lowerIndex, lowerIndex + 15);
+        const filtered = [...below, { isCMP: true }, ...above].reverse();
+        setMeta({ cmp, timestamp: result.timestamp });
+        setRecords(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(filtered)) {
+            return filtered;
+          }
+          return prev;
+        });
       } catch (err) {
         console.error("Error fetching live data:", err);
       }
@@ -40,54 +119,40 @@ const OptionChain = () => {
     });
   };
 
-  const getMaxSecondMax = (field, side) => {
-    const values = data?.records?.map(row => row?.[side]?.[field] || 0);
-    const sorted = [...new Set(values)].sort((a, b) => b - a);
-    return [sorted[0] || 1, sorted[1] || 1];
+  const highlight = {
+    maxCOI_CE: getMaxSecondMax('changeinOpenInterest', 'CE', records)[0],
+    secCOI_CE: getMaxSecondMax('changeinOpenInterest', 'CE', records)[1],
+    maxOI_CE: getMaxSecondMax('openInterest', 'CE', records)[0],
+    secOI_CE: getMaxSecondMax('openInterest', 'CE', records)[1],
+    maxVOL_CE: getMaxSecondMax('totalTradedVolume', 'CE', records)[0],
+    secVOL_CE: getMaxSecondMax('totalTradedVolume', 'CE', records)[1],
+    maxCOI_PE: getMaxSecondMax('changeinOpenInterest', 'PE', records)[0],
+    secCOI_PE: getMaxSecondMax('changeinOpenInterest', 'PE', records)[1],
+    maxOI_PE: getMaxSecondMax('openInterest', 'PE', records)[0],
+    secOI_PE: getMaxSecondMax('openInterest', 'PE', records)[1],
+    maxVOL_PE: getMaxSecondMax('totalTradedVolume', 'PE', records)[0],
+    secVOL_PE: getMaxSecondMax('totalTradedVolume', 'PE', records)[1]
   };
-
-  const cmp = data?.records?.[0]?.CE?.underlyingValue || 25000;
-  const sortedAsc = [...(data?.records || [])].sort((a, b) => a.strikePrice - b.strikePrice);
-
-  const lowerIndex = sortedAsc.findIndex(row => row.strikePrice > cmp);
-  const below = sortedAsc.slice(Math.max(0, lowerIndex - 10), lowerIndex);
-  const above = sortedAsc.slice(lowerIndex, lowerIndex + 10);
-  const filteredRecords = [...below, { isCMP: true }, ...above].reverse();
-
-  const [maxCOI_CE, secCOI_CE] = getMaxSecondMax('changeinOpenInterest', 'CE');
-  const [maxOI_CE, secOI_CE] = getMaxSecondMax('openInterest', 'CE');
-  const [maxVOL_CE, secVOL_CE] = getMaxSecondMax('totalTradedVolume', 'CE');
-  const [maxCOI_PE, secCOI_PE] = getMaxSecondMax('changeinOpenInterest', 'PE');
-  const [maxOI_PE, secOI_PE] = getMaxSecondMax('openInterest', 'PE');
-  const [maxVOL_PE, secVOL_PE] = getMaxSecondMax('totalTradedVolume', 'PE');
-
-  const getClass = (val, max, second, side) => {
-    if (val === max) return side === 'CE' ? 'bg-danger text-white' : 'bg-success text-white';
-    if (val === second) return 'bg-warning';
-    return '';
-  };
-
-  const getPercent = (val, max) => `${Math.round((val / max) * 100)}%`;
 
   return (
-    <div className="container mt-4">
-      <h3>Live Option Chain</h3>
+    <div className="container mt-4 optionchain-container">
+      <h2 className="text-gradient mb-4">Live Option Chain</h2>
       <div className="d-flex gap-3 align-items-center mb-3">
         <select className="form-select w-auto" value={index} onChange={(e) => setIndex(e.target.value)}>
           <option value="NIFTY">NIFTY</option>
           <option value="BANKNIFTY">BANKNIFTY</option>
           <option value="FINNIFTY">FINNIFTY</option>
         </select>
-        {data?.timestamp && (
-          <span className="text-muted">Last Refreshed: {formatTime(data.timestamp)}</span>
+        {meta?.timestamp && (
+          <span className="text-muted">Last Refreshed: {formatTime(meta.timestamp)}</span>
         )}
       </div>
 
-      {loading || !data ? (
+      {loading || !records.length ? (
         <p>Loading...</p>
       ) : (
         <>
-          <table className="table table-bordered table-sm text-center">
+          <table className="table table-bordered table-sm text-center optionchain-header">
             <thead className="table-dark">
               <tr>
                 <th>Call OI</th>
@@ -102,47 +167,19 @@ const OptionChain = () => {
               </tr>
             </thead>
           </table>
-          <div style={{ maxHeight: '700px', overflowY: 'auto' }}>
+          <div className="table-wrapper">
             <table className="table table-bordered table-sm text-center">
               <tbody>
-                {filteredRecords.map((row, idx) =>
-                  row.isCMP ? (
-                    <tr key="cmp" className="table-primary fw-bold">
-                      <td colSpan="9">Current Market Price: {cmp}</td>
-                    </tr>
-                  ) : (
-                    
-                    <tr key={idx}>
-                      <td className={getClass(row.CE?.openInterest, maxOI_CE, secOI_CE, 'CE')}>
-                        {row.CE?.openInterest ?? '-'}<br />
-                        {row.CE?.openInterest ? getPercent(row.CE.openInterest, maxOI_CE) : ''}
-                      </td>
-                      <td className={getClass(row.CE?.changeinOpenInterest, maxCOI_CE, secCOI_CE, 'CE')}>
-                        {row.CE?.changeinOpenInterest ?? '-'}<br />
-                        {row.CE?.changeinOpenInterest ? getPercent(row.CE.changeinOpenInterest, maxCOI_CE) : ''}
-                      </td>
-                      <td className={getClass(row.CE?.totalTradedVolume, maxVOL_CE, secVOL_CE, 'CE')}>
-                        {row.CE?.totalTradedVolume ?? '-'}<br />
-                        {row.CE?.totalTradedVolume ? getPercent(row.CE.totalTradedVolume, maxVOL_CE) : ''}
-                      </td>
-                      <td>{row.CE?.lastPrice ?? '-'}</td>
-                      <td className="fw-bold">{row.strikePrice}</td>
-                      <td>{row.PE?.lastPrice ?? '-'}</td>
-                      <td className={getClass(row.PE?.totalTradedVolume, maxVOL_PE, secVOL_PE, 'PE')}>
-                        {row.PE?.totalTradedVolume ?? '-'}<br />
-                        {row.PE?.totalTradedVolume ? getPercent(row.PE.totalTradedVolume, maxVOL_PE) : ''}
-                      </td>
-                      <td className={getClass(row.PE?.changeinOpenInterest, maxCOI_PE, secCOI_PE, 'PE')}>
-                        {row.PE?.changeinOpenInterest ?? '-'}<br />
-                        {row.PE?.changeinOpenInterest ? getPercent(row.PE.changeinOpenInterest, maxCOI_PE) : ''}
-                      </td>
-                      <td className={getClass(row.PE?.openInterest, maxOI_PE, secOI_PE, 'PE')}>
-                        {row.PE?.openInterest ?? '-'}<br />
-                        {row.PE?.openInterest ? getPercent(row.PE.openInterest, maxOI_PE) : ''}
-                      </td>
-                    </tr>
-                  )
-                )}
+                {records.map((row) => (
+                  <OptionRow
+                    key={row.strikePrice || (row.isCMP ? 'cmp' : Math.random())}
+                    row={row}
+                    cmp={meta.cmp}
+                    highlight={highlight}
+                    getClass={getClass}
+                    getPercent={getPercent}
+                  />
+                ))}
               </tbody>
             </table>
           </div>

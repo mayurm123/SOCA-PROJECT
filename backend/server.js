@@ -38,3 +38,28 @@ app.use(cors({
 // // Routes
 // const authRoutes = require('./routes/auth');
 // app.use('/api/auth', authRoutes);
+
+//added on 28/05/25 for : calling scheduler when backend start
+
+const { spawn } = require('child_process');
+const path = require('path');
+
+const server = express();
+
+// Start the Python scheduler as a child process
+const schedulerPath = path.join(__dirname,'..', 'python-service', 'scheduler.py');
+const pythonProcess = spawn('python', [schedulerPath]);
+
+pythonProcess.stdout.on('data', (data) => {
+  console.log(`[Python Scheduler]: ${data}`);
+});
+
+pythonProcess.stderr.on('data', (data) => {
+  console.error(`[Python Scheduler Error]: ${data}`);
+});
+
+pythonProcess.on('close', (code) => {
+  console.log(`[Python Scheduler] exited with code ${code}`);
+});
+
+

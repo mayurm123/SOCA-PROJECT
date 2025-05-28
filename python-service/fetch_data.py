@@ -99,11 +99,29 @@ def fetch_and_store(symbol):
         logger.error(f"Unexpected error fetching {symbol}: {e}")
 
 
+# Commented  by mayur : 28/05/25 for getting a call from scheduler   
+# if __name__ == "__main__":
+#     try:
+#         while True:
+#             for sym in SYMBOLS:
+#                 fetch_and_store(sym)
+#             time.sleep(30)
+#     except KeyboardInterrupt:
+#         logger.info("🛑 Stopped by user.")
+
+
+# added by mayur : 28/05/25 for getting a call from scheduler      
+
+  
+
+def main():
+    for sym in SYMBOLS:
+        fetch_and_store(sym)
+
 if __name__ == "__main__":
     try:
         while True:
-            for sym in SYMBOLS:
-                fetch_and_store(sym)
+            main()
             time.sleep(30)
     except KeyboardInterrupt:
         logger.info("🛑 Stopped by user.")
