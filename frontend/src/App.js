@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import OptionChain from './pages/OptionChain';
+import Backtest from './pages/Backtest';
 
 
 console.log('ProtectedRoute:', ProtectedRoute);
@@ -35,6 +36,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Backtest"
+          element={
+            <ProtectedRoute>
+              <Backtest />
             </ProtectedRoute>
           }
         />

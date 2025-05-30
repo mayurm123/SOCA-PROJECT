@@ -1,3 +1,5 @@
+//frontend/src/components.js
+
 import React from 'react';
 import { Navbar, Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
