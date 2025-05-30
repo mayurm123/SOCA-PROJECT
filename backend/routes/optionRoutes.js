@@ -14,6 +14,18 @@ router.get('/', async (req, res) => {
       return res.json(doc);
     }
 
+    // GET /api/options/expiries?index=NIFTY
+router.get('/expiries', async (req, res) => {
+  try {
+    const { index } = req.query;
+    const expiries = await Option.distinct('expiryDate', { symbol: index });
+    res.json(expiries.sort());
+  } catch (err) {
+    console.error('Error fetching expiries:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+    
     // Backtest mode: range filter
     if (from && to) {
       const fromDate = new Date(from);
@@ -32,5 +44,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Server error while fetching option chain' });
   }
 });
+
 
 module.exports = router;

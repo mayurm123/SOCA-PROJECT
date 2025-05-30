@@ -1,3 +1,4 @@
+//models/OptionChain.js
 const mongoose = require('mongoose');
 
 const optionSchema = new mongoose.Schema({
@@ -10,7 +11,7 @@ const optionSchema = new mongoose.Schema({
 });
 
 // ✅ Model name: Option, Schema: optionSchema, Collection name: option_chain
-module.exports = mongoose.model('Option', optionSchema, 'option_chain');
+//module.exports = mongoose.model('Option', optionSchema, 'option_chain');
 
-
+module.exports = mongoose.models.Option || mongoose.model('Option', optionSchema, 'option_chain');
 

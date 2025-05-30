@@ -9,7 +9,7 @@ def run_services():
     
 
 # # Schedule the jobs
-schedule.every().day.at("18:30").do(run_services)
+schedule.every().day.at("11:20").do(run_services)
 schedule.every().day.at("19:40").do(run_services)
 
 print("Scheduler started. Waiting for scheduled times...")
