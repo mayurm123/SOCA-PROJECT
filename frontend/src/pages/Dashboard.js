@@ -1,39 +1,49 @@
 import React from 'react';
-import { Card, Row, Col } from 'react-bootstrap';
+import { Card, Row, Col, Container } from 'react-bootstrap';
+import { FaChartLine, FaHistory, FaStream } from 'react-icons/fa';
+import './Dashboard.css'; // Custom styles (optional)
 
 const Dashboard = () => {
   return (
-    <div className="p-3">
-      <h2>Dashboard</h2>
-      <Row className="mt-3">
+    <Container fluid className="dashboard-container py-4 px-5">
+      <h2 className="mb-4 text-primary">📊 Dashboard</h2>
+      <Row className="g-4">
         <Col md={4}>
-          <Card>
+          <Card className="dashboard-card shadow-sm border-0">
             <Card.Body>
-              <Card.Title>Market Overview</Card.Title>
-              <Card.Text>Coming soon...</Card.Text>
+              <div className="d-flex align-items-center mb-3">
+                <FaChartLine size={28} className="text-info me-2" />
+                <Card.Title className="mb-0">Market Overview</Card.Title>
+              </div>
+              <Card.Text className="text-muted">Coming soon...</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4}>
-          <Card>
+          <Card className="dashboard-card shadow-sm border-0">
             <Card.Body>
-              <Card.Title>Backtest Results</Card.Title>
-              <Card.Text>Coming soon...</Card.Text>
+              <div className="d-flex align-items-center mb-3">
+                <FaHistory size={28} className="text-success me-2" />
+                <Card.Title className="mb-0">Backtest Results</Card.Title>
+              </div>
+              <Card.Text className="text-muted">Coming soon...</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4}>
-          <Card>
+          <Card className="dashboard-card shadow-sm border-0">
             <Card.Body>
-              <Card.Title>Live Option Chain</Card.Title>
-              <Card.Text>Coming soon...</Card.Text>
+              <div className="d-flex align-items-center mb-3">
+                <FaStream size={28} className="text-warning me-2" />
+                <Card.Title className="mb-0">Live Option Chain</Card.Title>
+              </div>
+              <Card.Text className="text-muted">Coming soon...</Card.Text>
             </Card.Body>
           </Card>
         </Col>
       </Row>
-    </div>
+    </Container>
   );
 };
 
 export default Dashboard;
-
