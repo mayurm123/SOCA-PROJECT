@@ -18,14 +18,14 @@ app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 // DB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error(err));
+  .catch(err => console.error(err)); 
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/options', optionRoutes);
 
 app.use('/api/options', backtestRoutes);
-//app.use('/api/backtest', backtestRoutes);
+app.use('/api/backtest', backtestRoutes);
 
 
 const PORT = process.env.PORT || 5000;
