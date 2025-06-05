@@ -1,6 +1,7 @@
 // src/pages/OptionChain.js
 import React, { useEffect, useState } from 'react';
 import '../OptionChain.css';
+import Header from '../components/Header';
 
 const OptionRow = React.memo(({ row, cmp, highlight, getClass, getPercent }) => {
   if (row.isCMP) {
@@ -84,8 +85,8 @@ const OptionChain = () => {
         const cmp = result?.records?.[0]?.CE?.underlyingValue || 25000;
         const sortedAsc = [...(result.records || [])].sort((a, b) => a.strikePrice - b.strikePrice);
         const lowerIndex = sortedAsc.findIndex(row => row.strikePrice > cmp);
-        const below = sortedAsc.slice(Math.max(0, lowerIndex - 15), lowerIndex);
-        const above = sortedAsc.slice(lowerIndex, lowerIndex + 15);
+        const below = sortedAsc.slice(Math.max(0, lowerIndex - 10), lowerIndex);
+        const above = sortedAsc.slice(lowerIndex, lowerIndex + 10);
         const filtered = [...below, { isCMP: true }, ...above].reverse();
         setMeta({ cmp, timestamp: result.timestamp });
         setRecords(prev => {
@@ -135,6 +136,8 @@ const OptionChain = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="container mt-4 optionchain-container">
       <h2 className="text-gradient mb-4">Live Option Chain</h2>
       <div className="d-flex gap-3 align-items-center mb-3">
@@ -152,7 +155,9 @@ const OptionChain = () => {
         <p>Loading...</p>
       ) : (
         <>
-          <table className="table table-bordered table-sm text-center optionchain-header">
+
+          <div className="table-wrapper">
+            <table className="table table-bordered table-sm text-center optionchain-table">
             <thead className="table-dark">
               <tr>
                 <th>Call OI</th>
@@ -166,9 +171,6 @@ const OptionChain = () => {
                 <th>Put OI</th>
               </tr>
             </thead>
-          </table>
-          <div className="table-wrapper">
-            <table className="table table-bordered table-sm text-center">
               <tbody>
                 {records.map((row) => (
                   <OptionRow
@@ -186,6 +188,7 @@ const OptionChain = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 

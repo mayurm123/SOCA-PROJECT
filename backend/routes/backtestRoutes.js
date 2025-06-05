@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     // const fromLocal = new Date(`${date}T${time}:00`);
     // const from = new Date(fromLocal.getTime() - 5.5 * 60 * 60 * 1000); // IST → UTC
     // const to = new Date(from.getTime() + parseInt(interval) * 60000);
-    console.log('🔍 Query:', { index, expiry, utcFrom, to });
+    //console.log('🔍 Query:', { index, expiry, utcFrom, to });
 
     const docs = await Option.find({
       symbol: index,

@@ -1,6 +1,7 @@
 // src/pages/Backtest.js
 import React, { useState, useEffect } from 'react';
 import '../OptionChain.css';
+import Header from '../components/Header';
 
 const Backtest = () => {
   const [index, setIndex] = useState('NIFTY');
@@ -119,6 +120,8 @@ const Backtest = () => {
   const [maxVOL_PE, secVOL_PE] = getMax('totalTradedVolume', 'PE');
 
   return (
+    <>
+    <Header />
     <div className="container mt-4 optionchain-container">
       <h2 className="text-gradient mb-4">Backtest Option Chain</h2>
 
@@ -157,7 +160,7 @@ const Backtest = () => {
         </div>
       </div>
 
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <label className="me-3">Interval:</label>
         {['1', '3', '5'].map((val) => (
           <label key={val} className="me-3">
@@ -172,29 +175,50 @@ const Backtest = () => {
             {val} min
           </label>
         ))}
-      </div>
+      </div> */}
+      
+      <div className="sticky-footer">
 
-      <div className="d-flex align-items-center mb-3 gap-3">
-        <div>
-          <button className="btn btn-primary" onClick={() => fetchBacktest()}>Fetch</button>
           <button className="btn btn-secondary ms-2" onClick={() => updateTime('backward')}>
             -{interval} min
           </button>          
           <button className="btn btn-secondary ms-2" onClick={() => updateTime('forward')}>
             +{interval} min
           </button>
+            {['1', '3', '5'].map((val) => (
+              <label key={val} className="me-3">
+            <input
+              type="radio"
+              value={val}
+              checked={interval === val}
+              onChange={e => setInterval(e.target.value)}
+              className="me-1"
+              name="interval"
+            />
+            {val} min
+          </label>
+        ))}
+      </div>
+
+
+      <div className="d-flex align-items-center mb-3 gap-3">
+        <div>
+          <button className="btn btn-primary" onClick={() => fetchBacktest()}>Fetch</button>
+
         </div>
         {timestamp && (
           <div className="text-muted">
-           <h3> ⏱ <strong>Timestamp: {formatTime(timestamp)}</strong></h3>
+           <h6> ⏱ <strong>Timestamp: {formatTime(timestamp)}</strong></h6>
           </div>
         )}
       </div>
 
       {records.length > 0 && (
         <>
-          <table className="table table-bordered table-sm text-center optionchain-header">
-            <thead className="table-dark">
+          
+          <div className="table-wrapper">
+            <table className="table table-bordered table-sm text-center optionchain-table">
+              <thead className="table-dark">
               <tr>
                 <th>Call OI</th>
                 <th>Call COI</th>
@@ -207,9 +231,6 @@ const Backtest = () => {
                 <th>Put OI</th>
               </tr>
             </thead>
-          </table>
-          <div className="table-wrapper">
-            <table className="table table-bordered table-sm text-center">
               <tbody>
                 {records.map((row, idx) =>
                   row.isCMP ? (
@@ -254,6 +275,7 @@ const Backtest = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 

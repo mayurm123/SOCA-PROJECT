@@ -1,3 +1,4 @@
+//server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -21,10 +22,10 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err)); 
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/options', optionRoutes);
 
-app.use('/api/options', backtestRoutes);
+app.use('/api/auth',authRoutes);
+//app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/options', optionRoutes);
 app.use('/api/backtest', backtestRoutes);
 
 
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
+ 
 
 // Enable CORS for frontend with cookies
 app.use(cors({
@@ -41,9 +43,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// // Routes
-// const authRoutes = require('./routes/auth');
-// app.use('/api/auth', authRoutes);
 
 //added on 28/05/25 for : calling scheduler when backend start
 
@@ -67,5 +66,6 @@ pythonProcess.stderr.on('data', (data) => {
 pythonProcess.on('close', (code) => {
   console.log(`[Python Scheduler] exited with code ${code}`);
 });
+
 
 

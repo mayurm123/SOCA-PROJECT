@@ -25,6 +25,8 @@ HEADERS = {
     "Accept": "*/*",
     "Referer": "https://www.nseindia.com/option-chain",
     "Connection": "keep-alive"
+
+
 }
 
 # Mongo setup

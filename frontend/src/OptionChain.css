@@ -16,19 +16,36 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
+    .sticky-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+       /* background: #ffffff; */
+      padding: 10px 20px;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
 .table-wrapper {
   max-height: 1000px;
-  overflow-y: auto;
-  border-radius: 8px;
-}
+  overflow-y: visible;
+  border-radius: 5px;
+} 
 
-thead th {
+
+ .optionchain-table thead th {
   position: sticky;
   top: 0;
   background-color: #343a40 !important;
   color: white !important;
   z-index: 2;
 }
+   
 
 td, th {
   vertical-align: middle !important;

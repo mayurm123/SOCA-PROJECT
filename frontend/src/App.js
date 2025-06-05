@@ -9,10 +9,10 @@ import OptionChain from './pages/OptionChain';
 import Backtest from './pages/Backtest';
 
 
-console.log('ProtectedRoute:', ProtectedRoute);
-console.log('Layout:', Layout);
-console.log('Login:', Login);
-console.log('Register:', Register);
+// console.log('ProtectedRoute:', ProtectedRoute);
+// console.log('Layout:', Layout);
+// console.log('Login:', Login);
+// console.log('Register:', Register);
 
 function App() {
   return (

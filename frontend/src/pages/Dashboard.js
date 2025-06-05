@@ -31,13 +31,13 @@ const Dashboard = () => {
           </Card>
         </Col>
         <Col md={4}>
-          <Card className="dashboard-card shadow-sm border-0">
+          <Card className="dashboard-card shadow-sm border-0" onClick={goToBacktetst} style={{ cursor: 'pointer' }}>
             <Card.Body>
               <div className="d-flex align-items-center mb-3">
                 <FaHistory size={28} className="text-success me-2" />
-                <Card.Title className="mb-0" onClick={goToBacktetst} style={{ cursor: 'pointer' }}>Backtest Data</Card.Title>
+                <Card.Title className="mb-0">Backtest Data</Card.Title>
               </div>
-              <Card.Text className="text-muted">Click to view live data</Card.Text>
+              <Card.Text className="text-muted">Click to view Backtest data</Card.Text>
             </Card.Body>
           </Card>
         </Col>
