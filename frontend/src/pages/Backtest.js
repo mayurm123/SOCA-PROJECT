@@ -15,6 +15,10 @@ const Backtest = () => {
   const [cmp, setCmp] = useState(0);
    
   const [availableDates, setAvailableDates] = useState([]);
+  
+  
+
+
 
       useEffect(() => {
         const fetchDates = async () => {
@@ -22,8 +26,9 @@ const Backtest = () => {
           try {
             const res = await fetch(`http://localhost:5000/api/backtest/dates?index=${index}&expiry=${expiry}`);
             const result = await res.json();
-            setAvailableDates(result);
-            setDate(result[0]); // set default selected date
+            const sorted = [...result].sort((a, b) => new Date(b) - new Date(a));// Sort descending
+            setAvailableDates(sorted);
+            setDate(sorted[0]); // set default selected date
           } catch (err) {
             console.error("Failed to fetch available dates:", err);
           }
@@ -38,8 +43,9 @@ const Backtest = () => {
       try {
         const res = await fetch(`http://localhost:5000/api/options/expiries?index=${index}`);
         const result = await res.json();
-        setExpiryList(result);
-        setExpiry(result[0]);
+        const sorted = [...result].sort((a, b) => new Date(b) - new Date(a));// Sort descending
+        setExpiryList(sorted);
+        setExpiry(sorted[0]);
       } catch (err) {
         console.error('Failed to fetch expiries:', err);
       }
